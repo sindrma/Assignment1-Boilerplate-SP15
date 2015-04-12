@@ -2,6 +2,7 @@
 var express = require('express');
 var passport = require('passport');
 var InstagramStrategy = require('passport-instagram').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 var http = require('http');
 var path = require('path');
 var handlebars = require('express-handlebars');
@@ -21,6 +22,9 @@ dotenv.load();
 var INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 var INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 var INSTAGRAM_CALLBACK_URL = process.env.INSTAGRAM_CALLBACK_URL;
+var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+var FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL;
 var INSTAGRAM_ACCESS_TOKEN = "";
 Instagram.set('client_id', INSTAGRAM_CLIENT_ID);
 Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
@@ -47,7 +51,32 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
+passport.use(new FacebookStrategy({
+      clientID: FACEBOOK_APP_ID,
+      clientSecret: FACEBOOK_APP_SECRET,
+      callbackURL: FACEBOOK_CALLBACK_URL
+    },
+    function(accessToken, refreshToken, profile, done) {
+      models.User.findOrCreate({
+        "name": profile.username,
+        "id": profile.id,
+        "access_token": accessToken
+      }, function(err, user, created) {
 
+        // created will be true here
+        models.User.findOrCreate({}, function(err, user, created) {
+          // created will be false here
+          process.nextTick(function () {
+            // To keep the example simple, the user's Instagram profile is returned to
+            // represent the logged-in user.  In a typical application, you would want
+            // to associate the Instagram account with a user record in your database,
+            // and return that user instead.
+            return done(null, profile);
+          });
+        })
+      });
+    }
+));
 
 // Use the InstagramStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
@@ -146,7 +175,11 @@ app.get('/photos', ensureAuthenticated, function(req, res){
     }
   });
 });
+app.get('/auth/facebook', passport.authenticate('facebook'));
 
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { successRedirect: '/account',
+      failureRedirect: '/login' }));
 
 // GET /auth/instagram
 //   Use passport.authenticate() as route middleware to authenticate the
