@@ -2,6 +2,7 @@
 var express = require('express');
 var passport = require('passport');
 var InstagramStrategy = require('passport-instagram').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 var http = require('http');
 var path = require('path');
 var handlebars = require('express-handlebars');
@@ -22,8 +23,13 @@ var INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 var INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 var INSTAGRAM_CALLBACK_URL = process.env.INSTAGRAM_CALLBACK_URL;
 var INSTAGRAM_ACCESS_TOKEN = "";
+var FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
+var FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
+var FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL;
+var FACEBOOK_ACCESS = "";
 Instagram.set('client_id', INSTAGRAM_CLIENT_ID);
 Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
+
 
 //connect to database
 mongoose.connect(process.env.MONGODB_CONNECTION_URL);
@@ -79,6 +85,34 @@ passport.use(new InstagramStrategy({
       })
     });
   }
+));
+
+passport.use(new FacebookStrategy({
+      clientID: FACEBOOK_CLIENT_ID,
+      clientSecret: FACEBOOK_CLIENT_SECRET,
+      callbackURL: FACEBOOK_CALLBACK_URL
+    },
+    function(accessToken, refreshToken, profile, done) {
+      // asynchronous verification, for effect...
+      models.User.findOrCreate({
+        "name": profile.username,
+        "id": profile.id,
+        "access_token": accessToken
+      }, function(err, user, created) {
+
+        // created will be true here
+        models.User.findOrCreate({}, function(err, user, created) {
+          // created will be false here
+          process.nextTick(function () {
+            // To keep the example simple, the user's Instagram profile is returned to
+            // represent the logged-in user.  In a typical application, you would want
+            // to associate the Instagram account with a user record in your database,
+            // and return that user instead.
+            return done(null, profile);
+          });
+        })
+      });
+    }
 ));
 
 //Configures the Template engine
@@ -170,6 +204,14 @@ app.get('/auth/instagram/callback',
   function(req, res) {
     res.redirect('/account');
   });
+
+app.get('/auth/facebook', passport.authenticate('facebook'));
+
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/login'}),
+    function(req, res) {
+      res.redirect('/account');
+    });
 
 app.get('/logout', function(req, res){
   req.logout();
