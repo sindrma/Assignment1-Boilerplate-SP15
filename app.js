@@ -11,6 +11,7 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var dotenv = require('dotenv');
 var Instagram = require('instagram-node-lib');
+var Facebook = require('fbgraphapi');
 var mongoose = require('mongoose');
 var app = express();
 
@@ -53,6 +54,7 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
+
 passport.use(new FacebookStrategy({
       clientID: FACEBOOK_APP_ID,
       clientSecret: FACEBOOK_APP_SECRET,
@@ -150,6 +152,11 @@ app.get('/login', function(req, res){
   res.render('login', { user: req.user });
 });
 
+app.get('/facebook', ensureAuthenticated, function(req, res){
+  res.render('facebook', {user: req.user});
+});
+
+
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', {user: req.user});
 });
@@ -160,20 +167,19 @@ app.get('/photos', ensureAuthenticated, function(req, res){
     if (err) return handleError(err);
     if (user) {
       // doc may be null if no document matched
-      Instagram.users.liked_by_self({
-        access_token: user.access_token,
+      Instagram.users.recent({
+        user_id: user.id,
         complete: function(data) {
-          //Map will iterate through the returned data obj
           var imageArr = data.map(function(item) {
-            //create temporary json object
             tempJSON = {};
             tempJSON.url = item.images.low_resolution.url;
-            //insert json object into image array
+            tempJSON.caption = item.caption.text;
             return tempJSON;
           });
-          res.render('photos', {photos: imageArr});
+          res.render('photos', {photos: imageArr, user:user});
         }
-      }); 
+      });
+
     }
   });
 });
@@ -198,7 +204,7 @@ app.get('/auth/instagram',
 app.get('/auth/instagram/callback', 
   passport.authenticate('instagram', { failureRedirect: '/login'}),
   function(req, res) {
-    res.redirect('/account');
+    res.redirect('/photos');
   });
 
 app.get('/auth/facebook', passport.authenticate('facebook'));

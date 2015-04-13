@@ -1,3 +1,17 @@
-{{#each photos}}
-  <img src="{{url}}" class="img-responsive" class="img hashtag-img">
-{{/each}}
+
+
+
+<div class="row center-block">
+    {{#each photos}}
+        <div class="col-lg-2 col-sm-3 col-xs-4 center-block">
+            <img src="{{url}}" class="img-responsive img-thumbnail hashtag-img">
+            <p class="lead">{{caption}} </p>
+        </div>
+    {{/each}}
+</div>
+
+
+
+
+
+
