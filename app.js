@@ -174,14 +174,19 @@ app.get('/photos', ensureAuthenticated, function(req, res){
             tempJSON = {};
             tempJSON.url = item.images.low_resolution.url;
             tempJSON.caption = item.caption.text;
+            tempJSON.id = item.images.id;
             return tempJSON;
           });
-          res.render('photos', {photos: imageArr, user:user});
+          res.render('photos', {photos: imageArr, user: req.user});
         }
       });
 
     }
   });
+});
+
+app.post('/instalike', ensureAuthenticated, function(req, res){
+
 });
 
 // GET /auth/instagram
