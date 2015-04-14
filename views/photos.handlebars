@@ -6,9 +6,9 @@
     </a>
 </div>
 
-<div class="row center-block">
+<div class="row" margin="auto">
     {{#each photos}}
-        <div class="col-lg-2 col-sm-3 col-xs-4 center-block">
+        <div class="col-lg-2 col-sm-3 col-xs-4">
             <img src="{{url}}" class="img-responsive img-thumbnail hashtag-img">
             <form action="/instalike" method="post">
                 <input name="img_id" value="{{id}}" type="hidden">

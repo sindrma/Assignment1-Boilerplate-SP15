@@ -174,7 +174,10 @@ app.get('/photos', ensureAuthenticated, function(req, res){
             tempJSON = {};
             tempJSON.url = item.images.low_resolution.url;
             tempJSON.caption = item.caption.text;
-            tempJSON.id = item.images.id;
+            tempJSON.id = item.id;
+            tempJSON.liked = req.user.username in item.likes.data.map(function(subitem){
+               return subitem.username;
+            });
             return tempJSON;
           });
           res.render('photos', {photos: imageArr, user: req.user});
