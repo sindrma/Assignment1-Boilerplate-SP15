@@ -1,3 +1,25 @@
-<p>ID: {{user.id}}</p>
-<p>Username: {{user.username}}</p>
-<p>Name:{{user.displayName}}</p>
+<body style="background-color: #242424;">
+<div class="jumbotron" style="margin-bottom: 0px;">
+    <div class="row">
+        <div class="col-xs-6 col-sm-4"></div>
+        <div class="col-xs-6 col-sm-4"><img class="" src="http://graph.facebook.com/{{user.id}}/picture?type=large" /></div>
+        <div class="col-xs-6 col-sm-4"></div>
+    </div>
+    <p>
+        <a href="{{user.link}}">
+            <button type="button" class="btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-thumbs-up"></span> Facebook
+            </button>
+        </a>
+    </p>
+    <p class="text-center">Name: {{user.name}}</p>
+    <p class="text-center">Birthday: {{user.birthday}}</p>
+    <p class="text-center">Gender: {{user.gender}}</p>
+    <p class="text-center">Email: {{user.email}}</p>
+    <p class="text-center">Hometown: {{user.hometown.name}}</p>
+    <p class="text-center">Location: {{user.location.name}}</p>
+
+</div>
+</body>
+
+
