@@ -93,6 +93,7 @@ passport.use(new InstagramStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
+    INSTAGRAM_ACCESS_TOKEN = accessToken;
     models.User.findOrCreate({
       "name": profile.username,
       "id": profile.id,
@@ -167,22 +168,35 @@ app.get('/photos', ensureAuthenticated, function(req, res){
     if (err) return handleError(err);
     if (user) {
       // doc may be null if no document matched
-      Instagram.users.recent({
-        user_id: user.id,
+      req.user.profile_picture = Instagram.users.info({
+        user_id:req.user.username,
+        complete: function(data){
+            return profile_picture;
+        }
+      });
+      var imageArr;
+      Instagram.users.self({
+        access_token: INSTAGRAM_ACCESS_TOKEN,
         complete: function(data) {
-          var imageArr = data.map(function(item) {
+            imageArr = data.map(function(item) {
             tempJSON = {};
-            tempJSON.url = item.images.low_resolution.url;
-            tempJSON.caption = item.caption.text;
+
+            tempJSON.url = item.images.standard_resolution.url;
+            if (item.caption) {
+              tempJSON.caption = item.caption.text;
+            } else {
+              tempJSON.caption = "";
+            }
             tempJSON.id = item.id;
-            tempJSON.liked = req.user.username in item.likes.data.map(function(subitem){
-               return subitem.username;
-            });
             return tempJSON;
           });
           res.render('photos', {photos: imageArr, user: req.user});
         }
       });
+
+
+
+
 
     }
   });
