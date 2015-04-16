@@ -1,17 +1,25 @@
 <body style="background-color: #242424;">
-<div class="jumbotron" style="margin-bottom: 0px;">
-    <div class="row">
-        <div class="col-xs-6 col-sm-4"></div>
-        <div class="col-xs-6 col-sm-4"><img class="" src="http://graph.facebook.com/{{user.id}}/picture?type=large" /></div>
-        <div class="col-xs-6 col-sm-4"></div>
+<nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+        <div class="col-sm-4">
+            <a href="{{user.link}}"><img src="http://graph.facebook.com/{{user.id}}/picture?type=normal" class="img-responsive img-circle" ></a>
+        </div>
+        <div class="col-sm-4">
+            <a href="{{user.link}}"><p class="text-center" style="color: #f9f9f9; margin-top: 25%">{{user.name}}</p></a>
+        </div>
     </div>
-    <p>
-        <a href="{{user.link}}">
-            <button type="button" class="btn btn-default btn-sm">
-                <span class="glyphicon glyphicon-thumbs-up"></span> Facebook
-            </button>
-        </a>
-    </p>
+    <div class="container-fliud" style="margin-left: 43%">
+        <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-thumbs-up"></span> Facebook Info</h2>
+    </div>
+    <div class="container-fluid">
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="jumbotron" style="margin-bottom: 0px;">
+
     <p class="text-center">Name: {{user.name}}</p>
     <p class="text-center">Birthday: {{user.birthday}}</p>
     <p class="text-center">Gender: {{user.gender}}</p>

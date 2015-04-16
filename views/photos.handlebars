@@ -1,25 +1,79 @@
-<div class="jumbotron">
-    <h1 class="text-center">Instagram user {{user.username}}</h1>
-    <p class="text-center">This page shows the images you have posted on your feed. You can like them if you want!</p>
-    <a href="/logout" class="btn btn-default btn-sm pull-right">
-        Log out
-    </a>
+<body style="background-color: #242424">
+
+<nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+        <div class="col-sm-4">
+            <img src="{{user._json.data.profile_picture}}" class="img-responsive img-circle" >
+        </div>
+        <div class="col-sm-4">
+            <p class="text-center" style="color: #f9f9f9; margin-top: 25%">{{user.username}}</p>
+        </div>
+    </div>
+    <div class="container-fliud" style="margin-left: 43%">
+            <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-camera"></span> Instagram feed</h2>
+    </div>
+    <div class="container-fluid">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+    </div>
+</nav>
+
+<div class="container" >
+
+    <div id="carousel-example-generic" class="carousel slide" >
+        <div class="carousel-inner" style='height: 700px'>
+            {{#each photos}}
+                {{#if @first}}
+                    <div class="item active">
+                        <div class="inner-item" style="text-align: center">
+                            <img class="img-rounded" src="{{url}}" style="margin: 0 auto">
+                            <h4 style="color: #f9f9f9">
+                                {{#if caption}}
+                                    {{owner_name}}: {{caption}}
+                                {{else}}
+                                    {{owner_name}}
+                                {{/if}}
+                            </h4>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="item">
+                        <div class="inner-item" style="text-align: center">
+                            <img class="img-rounded" src="{{url}}" style="margin: 0 auto">
+                            <h4 style="color: #f9f9f9">
+                                {{#if caption}}
+                                    {{owner_name}}: {{caption}}
+                                {{else}}
+                                    {{owner_name}}
+                                {{/if}}
+                            </h4>
+                        </div>
+
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+
+    
 </div>
 
-<div class="row center-block">
-    {{#each photos}}
-        <div class="col-lg-2 col-sm-3 col-xs-4 center-block">
-            <img src="{{url}}" class="img-responsive img-thumbnail hashtag-img">
-            <form action="/instalike" method="post">
-                <input name="img_id" value="{{id}}" type="hidden">
-                <button type="button" class="btn btn-default">
-                    <span class="glyphicon glyphicon-heart"></span> Heart
-                </button>
-            </form>
-            <p class="lead">{{caption}} </p>
-        </div>
-    {{/each}}
-</div>
+<script>
+    $(document).ready(function(){
+        $('.carousel').carousel({});
+    });
+</script>
+
+</body>
+
+
 
 
 
