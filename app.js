@@ -216,10 +216,6 @@ app.get('/photos', ensureAuthenticated, function(req, res){
   });
 });
 
-app.post('/instalike', ensureAuthenticated, function(req, res){
-
-});
-
 // GET /auth/instagram
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in Instagram authentication will involve
