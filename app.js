@@ -169,10 +169,6 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
     fb.graph('/me/likes', function(err, res){
       me_likes = res.data;
       fb.graph('/me/photos', function(err, res){
-        fb.graph('/me/feed', function(err, res){
-          console.log(res);
-        });
-
           photoArr = res.data.map(function (item) {
             tempJSON = {};
             tempJSON.source = item.images[2].source;
@@ -185,7 +181,10 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
             tempJSON.id = item.id;
             return tempJSON;
           });
-          page.render('facebook', {user: me, likes: me_likes, photos: photoArr});
+        fb.graph('/me/feed', function(err, res){
+          console.log(res.data[0].story);
+          page.render('facebook', {user: me, likes: me_likes, photos: photoArr, latest_story:res.data[0].story});
+        });
       });
     });
   });
