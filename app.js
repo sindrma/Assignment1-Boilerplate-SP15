@@ -201,6 +201,8 @@ app.get('/photos', ensureAuthenticated, function(req, res){
             } else {
               tempJSON.caption = "";
             }
+              tempJSON.owner_name = item.user.username;
+              tempJSON.owner_profile_pic = item.user.profile_picture;
             tempJSON.id = item.id;
             return tempJSON;
           });
