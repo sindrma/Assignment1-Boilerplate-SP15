@@ -11,9 +11,10 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var dotenv = require('dotenv');
 var Instagram = require('instagram-node-lib');
-var Facebook = require('fbgraphapi');
+var fbgraph = require('fbgraphapi');
 var mongoose = require('mongoose');
 var app = express();
+var me = {};
 
 //local dependencies
 var models = require('./models');
@@ -27,7 +28,7 @@ var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 var FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL;
 var INSTAGRAM_ACCESS_TOKEN = "";
-var FACEBOOK_ACCESS = "";
+var FACEBOOK_ACCESS_TOKEN = "";
 Instagram.set('client_id', INSTAGRAM_CLIENT_ID);
 Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
 
@@ -61,14 +62,19 @@ passport.use(new FacebookStrategy({
       callbackURL: FACEBOOK_CALLBACK_URL
     },
     function(accessToken, refreshToken, profile, done) {
+      FACEBOOK_ACCESS_TOKEN = accessToken;
       models.User.findOrCreate({
         "name": profile.username,
         "id": profile.id,
         "access_token": accessToken
       }, function(err, user, created) {
-
         // created will be true here
-        models.User.findOrCreate({}, function(err, user, created) {
+        models.User.findOrCreate({
+          "name": profile.username,
+          "id": profile.id,
+          "access_token": accessToken
+        }, function(err, user, created) {
+
           // created will be false here
           process.nextTick(function () {
             // To keep the example simple, the user's Instagram profile is returned to
@@ -154,7 +160,15 @@ app.get('/login', function(req, res){
 });
 
 app.get('/facebook', ensureAuthenticated, function(req, res){
-  res.render('facebook', {user: req.user});
+  var page=res;
+  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  fb.graph('/me', function(err, res) {
+    me = res;
+    fb.graph('/me/friends', function(err, res){
+      console.log(res.data);
+      page.render('facebook', {user: me});
+    });
+  });
 });
 
 
@@ -229,12 +243,14 @@ app.get('/auth/instagram/callback',
     res.redirect('/photos');
   });
 
-app.get('/auth/facebook', passport.authenticate('facebook'));
+app.get('/auth/facebook',
+    passport.authenticate('facebook', { scope: ['friends_birthday','read_stream', 'publish_actions', 'email', 'user_likes', 'user_friends', 'user_about_me', 'user_birthday','user_hometown','user_location','user_photos','public_profile'] })
+);
 
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: '/login'}),
     function(req, res) {
-      res.redirect('/account');
+      res.redirect('/facebook');
     });
 
 app.get('/logout', function(req, res){
