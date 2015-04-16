@@ -163,8 +163,8 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
   var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
   fb.graph('/me', function(err, res) {
     me = res;
-    fb.graph('/me/friends', function(err, res){
-      console.log(res.data);
+    fb.graph('/me/likes', function(err, res){
+      console.log(res);
       page.render('facebook', {user: me});
     });
   });
