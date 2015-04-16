@@ -8,38 +8,29 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav" >
-                <li role="presentation" class="active"><a href="/facebook" >Info</a></li>
-                <li role="presentation"><a href="/facebook_photos" >Photos</a></li>
+                <li role="presentation" ><a href="/facebook" >Info</a></li>
+                <li role="presentation" class="active"><a href="/facebook_photos" >Photos</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-               <li> <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
-               </li>
+                <li> <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+                </li>
             </ul>
         </div>
-        </div>
+    </div>
 </nav>
 <div class="col-sm-offset-5">
     <h2 style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-thumbs-up"></span> Facebook</h2>
 </div>
-<div class="jumbotron" style="margin-bottom: 0px;">
-    <p class="text-center">Name: {{user.name}}</p>
-    <p class="text-center">Birthday: {{user.birthday}}</p>
-    <p class="text-center">Gender: {{user.gender}}</p>
-    <p class="text-center">Email: {{user.email}}</p>
-    <p class="text-center">Hometown: {{user.hometown.name}}</p>
-    <p class="text-center">Location: {{user.location.name}}</p>
-
-</div>
-<h4 class="text-center" style="font-size: 150%; color: #f9f9f9">Your likes on Facebook</h4>
+<h4 class="text-center" style="font-size: 150%; color: #f9f9f9">Photos you are tagged in on Facebook</h4>
 <div class="container">
 
-    <div id="carousel-example-generic" class="carousel slide" style="margin-left: 35%;margin-right: 35%">
-        <div class="carousel-inner" style='height: 250px'>
-            {{#each likes}}
+    <div id="carousel-example-generic2" class="carousel slide" >
+        <div class="carousel-inner" style='height: 800px'>
+            {{#each photos}}
                 {{#if @first}}
                     <div class="item active">
                         <div class="inner-item" style="text-align: center">
-                            <img class="img-rounded" src="http://graph.facebook.com/{{id}}/picture?type=large" style="margin: 0 auto">
+                            <img class="img-rounded" src="{{source}}" style="margin: 0 auto">
                             <h4 style="color: #f9f9f9">
                                 {{#if caption}}
                                     {{owner_name}}: {{caption}}
@@ -52,7 +43,7 @@
                 {{else}}
                     <div class="item">
                         <div class="inner-item" style="text-align: center">
-                            <img class="img-rounded" src="http://graph.facebook.com/{{id}}/picture?type=large" style="margin: 0 auto">
+                            <img class="img-rounded" src="{{source}}" style="margin: 0 auto">
                             <h4 style="color: #f9f9f9">
                                 {{#if caption}}
                                     {{owner_name}}: {{caption}}
@@ -66,10 +57,10 @@
                 {{/if}}
             {{/each}}
         </div>
-        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+        <a class="left carousel-control" href="#carousel-example-generic2" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left"></span>
         </a>
-        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+        <a class="right carousel-control" href="#carousel-example-generic2" data-slide="next">
             <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
     </div>

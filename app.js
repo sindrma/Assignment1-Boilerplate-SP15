@@ -15,6 +15,8 @@ var fbgraph = require('fbgraphapi');
 var mongoose = require('mongoose');
 var app = express();
 var me = {};
+var me_likes = {};
+var photoArr = {};
 
 //local dependencies
 var models = require('./models');
@@ -165,12 +167,52 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
   fb.graph('/me', function(err, res) {
     me = res;
     fb.graph('/me/likes', function(err, res){
-      console.log(res);
-      page.render('facebook', {user: me,likes: res.data});
+      me_likes = res.data;
+      fb.graph('/me/photos', function(err, res){
+        fb.graph('/me/feed', function(err, res){
+          console.log(res);
+        });
+
+          photoArr = res.data.map(function (item) {
+            tempJSON = {};
+            tempJSON.source = item.images[2].source;
+            if (item.name) {
+              tempJSON.name = item.name;
+            } else {
+              tempJSON.name = "";
+            }
+            tempJSON.from = item.from.name;
+            tempJSON.id = item.id;
+            return tempJSON;
+          });
+          page.render('facebook', {user: me, likes: me_likes, photos: photoArr});
+      });
     });
   });
 });
+app.get('/facebook_photos', ensureAuthenticated, function(req, res){
+  var page=res;
+  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  fb.graph('/me', function(err, res) {
+    me = res;
+      fb.graph('/me/photos', function(err, res){
+        photoArr = res.data.map(function (item) {
+          tempJSON = {};
+          tempJSON.source = item.images[2].source;
+          if (item.name) {
+            tempJSON.name = item.name;
+          } else {
+            tempJSON.name = "";
+          }
+          tempJSON.from = item.from.name;
+          tempJSON.id = item.id;
+          return tempJSON;
+        });
+        page.render('facebook_photos', {user: me, photos: photoArr});
+      });
 
+  });
+});
 
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', {user: req.user});
