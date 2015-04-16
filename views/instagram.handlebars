@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="container-fliud" style="margin-left: 43%">
-            <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-camera"></span> Instagram feed</h2>
+            <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-camera"></span> Instagram</h2>
     </div>
     <div class="container-fluid">
             <ul class="nav navbar-nav navbar-right">
@@ -21,7 +21,7 @@
 
 <div class="container" >
 
-    <div id="carousel-example-generic" class="carousel slide" >
+    <div id="carousel-example-generic" class="carousel slide" style="background-color: #242424; color: #242424">
         <div class="carousel-inner" style='height: 700px'>
             {{#each photos}}
                 {{#if @first}}
@@ -54,14 +54,13 @@
                 {{/if}}
             {{/each}}
         </div>
-        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-        </a>
-        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-            <span class="glyphicon glyphicon-chevron-right"></span>
-        </a>
+            <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev" style="background-image: none">
+                <span class="glyphicon glyphicon-chevron-left" style="color: #f9f9f9"></span>
+            </a>
+            <a class="right carousel-control" href="#carousel-example-generic" data-slide="next" style="background-image: none">
+                <span class="glyphicon glyphicon-chevron-right" style="color: #f9f9f9"></span>
+            </a>
     </div>
-
     
 </div>
 

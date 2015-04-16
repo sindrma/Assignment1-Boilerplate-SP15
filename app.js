@@ -176,25 +176,18 @@ app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', {user: req.user});
 });
 
-app.get('/photos', ensureAuthenticated, function(req, res){
+app.get('/instagram', ensureAuthenticated, function(req, res){
   var query  = models.User.where({ name: req.user.username });
   query.findOne(function (err, user) {
     if (err) return handleError(err);
     if (user) {
       // doc may be null if no document matched
-      req.user.profile_picture = Instagram.users.info({
-        user_id:req.user.username,
-        complete: function(data){
-            return profile_picture;
-        }
-      });
-      var imageArr;
+
       Instagram.users.self({
         access_token: INSTAGRAM_ACCESS_TOKEN,
         complete: function(data) {
-            imageArr = data.map(function(item) {
-            tempJSON = {};
-
+            var imageArr = data.map(function(item) {
+              tempJSON = {};
             tempJSON.url = item.images.standard_resolution.url;
             if (item.caption) {
               tempJSON.caption = item.caption.text;
@@ -206,7 +199,7 @@ app.get('/photos', ensureAuthenticated, function(req, res){
             tempJSON.id = item.id;
             return tempJSON;
           });
-          res.render('photos', {photos: imageArr, user: req.user});
+          res.render('instagram', {photos: imageArr, user: req.user});
         }
       });
 
@@ -238,7 +231,7 @@ app.get('/auth/instagram',
 app.get('/auth/instagram/callback', 
   passport.authenticate('instagram', { failureRedirect: '/login'}),
   function(req, res) {
-    res.redirect('/photos');
+    res.redirect('/instagram');
   });
 
 app.get('/auth/facebook',
