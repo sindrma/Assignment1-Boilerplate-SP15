@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="container-fliud" style="margin-left: 43%">
-        <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-thumbs-up"></span> Facebook Info</h2>
+        <h2 class="navbar-brand" style="font-size: 200%; color: #f9f9f9"><span class="glyphicon glyphicon-thumbs-up"></span> Facebook</h2>
     </div>
     <div class="container-fluid">
         <ul class="nav navbar-nav navbar-right">
@@ -26,6 +26,52 @@
     <p class="text-center">Email: {{user.email}}</p>
     <p class="text-center">Hometown: {{user.hometown.name}}</p>
     <p class="text-center">Location: {{user.location.name}}</p>
+
+</div>
+<h4 class="text-center" style="font-size: 150%; color: #f9f9f9">Your likes on Facebook</h4>
+<div class="container">
+
+    <div id="carousel-example-generic" class="carousel slide" style="margin-left: 35%;margin-right: 35%">
+        <div class="carousel-inner" style='height: 250px'>
+            {{#each likes}}
+                {{#if @first}}
+                    <div class="item active">
+                        <div class="inner-item" style="text-align: center">
+                            <img class="img-rounded" src="http://graph.facebook.com/{{id}}/picture?type=large" style="margin: 0 auto">
+                            <h4 style="color: #f9f9f9">
+                                {{#if caption}}
+                                    {{owner_name}}: {{caption}}
+                                {{else}}
+                                    {{name}}
+                                {{/if}}
+                            </h4>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="item">
+                        <div class="inner-item" style="text-align: center">
+                            <img class="img-rounded" src="http://graph.facebook.com/{{id}}/picture?type=large" style="margin: 0 auto">
+                            <h4 style="color: #f9f9f9">
+                                {{#if caption}}
+                                    {{owner_name}}: {{caption}}
+                                {{else}}
+                                    {{name}}
+                                {{/if}}
+                            </h4>
+                        </div>
+
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+
 
 </div>
 </body>

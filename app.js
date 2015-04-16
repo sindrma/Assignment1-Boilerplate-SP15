@@ -166,7 +166,7 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
     me = res;
     fb.graph('/me/likes', function(err, res){
       console.log(res);
-      page.render('facebook', {user: me});
+      page.render('facebook', {user: me,likes: res.data});
     });
   });
 });
