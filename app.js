@@ -71,11 +71,7 @@ passport.use(new FacebookStrategy({
         "access_token": accessToken
       }, function(err, user, created) {
         // created will be true here
-        models.User.findOrCreate({
-          "name": profile.username,
-          "id": profile.id,
-          "access_token": accessToken
-        }, function(err, user, created) {
+        models.User.findOrCreate({}, function(err, user, created) {
 
           // created will be false here
           process.nextTick(function () {
@@ -83,7 +79,8 @@ passport.use(new FacebookStrategy({
             // represent the logged-in user.  In a typical application, you would want
             // to associate the Instagram account with a user record in your database,
             // and return that user instead.
-            return done(null, profile);
+
+            return done(null, user);
           });
         })
       });
@@ -163,7 +160,7 @@ app.get('/login', function(req, res){
 
 app.get('/facebook', ensureAuthenticated, function(req, res){
   var page=res;
-  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  var fb = new fbgraph.Facebook(req.access_token, 'v2.2');
   fb.graph('/me', function(err, res) {
     me = res;
     fb.graph('/me/likes', function(err, res){
@@ -191,7 +188,7 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
 });
 app.get('/facebook_photos', ensureAuthenticated, function(req, res){
   var page=res;
-  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  var fb = new fbgraph.Facebook(req.access_token, 'v2.2');
   fb.graph('/me', function(err, res) {
     me = res;
       fb.graph('/me/photos', function(err, res){
