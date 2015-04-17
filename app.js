@@ -95,7 +95,7 @@ passport.use(new InstagramStrategy({
     }, function(err, user, created) {
 
       models.User.findOrCreate({}, function(err, user, created) {
-        
+
         process.nextTick(function () {
 
           // To keep the example simple, the user's Instagram profile is returned to
@@ -218,7 +218,7 @@ app.get('/instagram', ensureAuthenticated, function(req, res){
       // doc may be null if no document matched
 
       Instagram.users.self({
-        access_token: user.access_token,
+        access_token: INSTAGRAM_ACCESS_TOKEN,
         complete: function(data) {
             var imageArr = data.map(function(item) {
               tempJSON = {};
