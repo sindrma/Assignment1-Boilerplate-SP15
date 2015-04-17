@@ -64,11 +64,9 @@ passport.use(new FacebookStrategy({
       callbackURL: FACEBOOK_CALLBACK_URL
     },
     function(accessToken, refreshToken, profile, done) {
-      FACEBOOK_ACCESS_TOKEN = accessToken;
       models.User.findOrCreate({
         "name": profile.displayName,
-        "id": profile.id,
-        "access_token": accessToken
+        "id": profile.id
       }, function(err, user, created) {
         console.log(user);
         console.log("1---------------------");
@@ -107,8 +105,7 @@ passport.use(new InstagramStrategy({
     INSTAGRAM_ACCESS_TOKEN = accessToken;
     models.User.findOrCreate({
       "name": profile.username,
-      "id": profile.id,
-      "access_token": accessToken 
+      "id": profile.id
     }, function(err, user, created) {
         user.access_token = accessToken;
       // created will be true here
