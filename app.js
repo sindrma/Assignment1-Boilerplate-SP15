@@ -260,9 +260,7 @@ app.get('/instagram', ensureAuthenticated, function(req, res){
             tempJSON.id = item.id;
             return tempJSON;
           });
-            user.update({"id" : user.id},{"access_token" : req.access_token},{});
-            user._json = req._json;
-          res.render('instagram', {photos: imageArr, user: user});
+          res.render('instagram', {photos: imageArr, user: req.user});
         }
       });
 
