@@ -66,22 +66,13 @@ passport.use(new FacebookStrategy({
     function(accessToken, refreshToken, profile, done) {
       FACEBOOK_ACCESS_TOKEN = accessToken;
       models.User.findOrCreate({
-        "name": profile.name,
+        "name": profile.username,
         "id": profile.id,
         "access_token": accessToken
       }, function(err, user, created) {
         console.log(user);
         console.log("1---------------------");
         // created will be true here
-         if(user) {
-              user.access_token = accessToken;
-              user.save(function(err, doc) {
-                  done(err, doc);
-              });
-          } else {
-              done(err, user);
-          }
-          /*
         models.User.findOrCreate({}, function(err, user, created) {
           user.access_token = accessToken;
           console.log(user);
@@ -97,7 +88,7 @@ passport.use(new FacebookStrategy({
             // and return that user instead.
             return done(null, user);
           });
-      }) */
+      })
     });
   }
 ));
@@ -113,7 +104,7 @@ passport.use(new InstagramStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
-
+    INSTAGRAM_ACCESS_TOKEN = accessToken;
     models.User.findOrCreate({
       "name": profile.username,
       "id": profile.id,
@@ -123,13 +114,12 @@ passport.use(new InstagramStrategy({
       models.User.findOrCreate({}, function(err, user, created) {
         // created will be false here
         process.nextTick(function () {
-            user.access_token = accessToken;
           // To keep the example simple, the user's Instagram profile is returned to
           // represent the logged-in user.  In a typical application, you would want
           // to associate the Instagram account with a user record in your database,
           // and return that user instead.
 
-          return done(null, user);
+          return done(null, profile);
         });
       })
     });
@@ -245,7 +235,7 @@ app.get('/instagram', ensureAuthenticated, function(req, res){
       // doc may be null if no document matched
 
       Instagram.users.self({
-        access_token: user.access_token,
+        access_token: INSTAGRAM_ACCESS_TOKEN,
         complete: function(data) {
             var imageArr = data.map(function(item) {
               tempJSON = {};
