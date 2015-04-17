@@ -30,7 +30,6 @@ var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 var FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL;
 var INSTAGRAM_ACCESS_TOKEN = "";
-var FACEBOOK_ACCESS_TOKEN = "";
 Instagram.set('client_id', INSTAGRAM_CLIENT_ID);
 Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
 
@@ -64,29 +63,16 @@ passport.use(new FacebookStrategy({
       callbackURL: FACEBOOK_CALLBACK_URL
     },
     function(accessToken, refreshToken, profile, done) {
-      FACEBOOK_ACCESS_TOKEN = accessToken;
       models.User.findOrCreate({
         "name": profile.username,
         "id": profile.id,
         "access_token": accessToken
       }, function(err, user, created) {
-        console.log(user);
-        console.log("1---------------------");
-        // created will be true here
         }, function(err, user, created) {
         models.User.findOrCreate({}, function(err, user, created) {
           user.access_token = accessToken;
-          console.log(user);
-          console.log("2---------------------");
-          // created will be false here
           process.nextTick(function () {
-            console.log(user);
             user.access_token = accessToken;
-            console.log("3---------------------");
-            // To keep the example simple, the user's Instagram profile is returned to
-            // represent the logged-in user.  In a typical application, you would want
-            // to associate the Instagram account with a user record in your database,
-            // and return that user instead.
             return done(null, user);
           });
       })
@@ -104,22 +90,16 @@ passport.use(new InstagramStrategy({
     callbackURL: INSTAGRAM_CALLBACK_URL
   },
   function(accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
     INSTAGRAM_ACCESS_TOKEN = accessToken;
     models.User.findOrCreate({
       "name": profile.username,
       "id": profile.id,
       "access_token": accessToken 
     }, function(err, user, created) {
-      // created will be true here
       models.User.findOrCreate({}, function(err, user, created) {
-        // created will be false here
+        user.access_token = accessToken;
         process.nextTick(function () {
-          // To keep the example simple, the user's Instagram profile is returned to
-          // represent the logged-in user.  In a typical application, you would want
-          // to associate the Instagram account with a user record in your database,
-          // and return that user instead.
-
+          user.access_token = accessToken;
           return done(null, profile);
         });
       })
@@ -166,10 +146,6 @@ app.get('/login', function(req, res){
 });
 
 app.get('/facebook', ensureAuthenticated, function(req, res){
-  console.log(req);
-  console.log("4---------------------");
-  console.log("5---------------------");
-  console.log(req.user.access_token);
   var page=res;
   var fb = new fbgraph.Facebook(req.user.access_token, 'v2.2');
   fb.graph('/me', function(err, res) {
@@ -247,6 +223,7 @@ app.get('/instagram', ensureAuthenticated, function(req, res){
             tempJSON.id = item.id;
             return tempJSON;
           });
+          user._json = req.user._json;
           res.render('instagram', {photos: imageArr, user: req.user});
         }
       });
