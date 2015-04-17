@@ -73,6 +73,15 @@ passport.use(new FacebookStrategy({
         console.log(user);
         console.log("1---------------------");
         // created will be true here
+         if(user) {
+              user.access_token = accessToken;
+              user.save(function(err, doc) {
+                  done(err, doc);
+              });
+          } else {
+              done(err, user);
+          }
+          /*
         models.User.findOrCreate({}, function(err, user, created) {
           user.access_token = accessToken;
           console.log(user);
@@ -88,7 +97,7 @@ passport.use(new FacebookStrategy({
             // and return that user instead.
             return done(null, user);
           });
-      })
+      }) */
     });
   }
 ));
