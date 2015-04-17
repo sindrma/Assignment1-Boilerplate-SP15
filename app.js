@@ -70,24 +70,28 @@ passport.use(new FacebookStrategy({
         "id": profile.id,
         "access_token": accessToken
       }, function(err, user, created) {
+        console.log(user);
+        console.log("1---------------------");
         // created will be true here
-        models.User.findOrCreate({
-          "name": profile.username,
-          "id": profile.id,
-          "access_token": accessToken
         }, function(err, user, created) {
-
+        models.User.findOrCreate({}, function(err, user, created) {
+          user.access_token = accessToken;
+          console.log(user);
+          console.log("2---------------------");
           // created will be false here
           process.nextTick(function () {
+            console.log(user);
+            user.access_token = accessToken;
+            console.log("3---------------------");
             // To keep the example simple, the user's Instagram profile is returned to
             // represent the logged-in user.  In a typical application, you would want
             // to associate the Instagram account with a user record in your database,
             // and return that user instead.
-            return done(null, profile);
+            return done(null, user);
           });
-        })
-      });
-    }
+      })
+    });
+  }
 ));
 
 // Use the InstagramStrategy within Passport.
@@ -107,7 +111,6 @@ passport.use(new InstagramStrategy({
       "id": profile.id,
       "access_token": accessToken 
     }, function(err, user, created) {
-      
       // created will be true here
       models.User.findOrCreate({}, function(err, user, created) {
         // created will be false here
@@ -116,6 +119,7 @@ passport.use(new InstagramStrategy({
           // represent the logged-in user.  In a typical application, you would want
           // to associate the Instagram account with a user record in your database,
           // and return that user instead.
+
           return done(null, profile);
         });
       })
@@ -162,8 +166,12 @@ app.get('/login', function(req, res){
 });
 
 app.get('/facebook', ensureAuthenticated, function(req, res){
+  console.log(req);
+  console.log("4---------------------");
+  console.log("5---------------------");
+  console.log(req.user.access_token);
   var page=res;
-  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  var fb = new fbgraph.Facebook(req.user.access_token, 'v2.2');
   fb.graph('/me', function(err, res) {
     me = res;
     fb.graph('/me/likes', function(err, res){
@@ -182,7 +190,6 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
             return tempJSON;
           });
         fb.graph('/me/feed', function(err, res){
-          console.log(res.data[0].story);
           page.render('facebook', {user: me, likes: me_likes, photos: photoArr, latest_story:res.data[0].story});
         });
       });
@@ -191,7 +198,7 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
 });
 app.get('/facebook_photos', ensureAuthenticated, function(req, res){
   var page=res;
-  var fb = new fbgraph.Facebook(FACEBOOK_ACCESS_TOKEN, 'v2.2');
+  var fb = new fbgraph.Facebook(req.user.access_token, 'v2.2');
   fb.graph('/me', function(err, res) {
     me = res;
       fb.graph('/me/photos', function(err, res){
