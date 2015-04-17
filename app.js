@@ -66,7 +66,7 @@ passport.use(new FacebookStrategy({
     function(accessToken, refreshToken, profile, done) {
       FACEBOOK_ACCESS_TOKEN = accessToken;
       models.User.findOrCreate({
-        "name": profile.username,
+        "name": profile.name,
         "id": profile.id,
         "access_token": accessToken
       }, function(err, user, created) {
@@ -114,12 +114,13 @@ passport.use(new InstagramStrategy({
       models.User.findOrCreate({}, function(err, user, created) {
         // created will be false here
         process.nextTick(function () {
+            user.access_token = accessToken;
           // To keep the example simple, the user's Instagram profile is returned to
           // represent the logged-in user.  In a typical application, you would want
           // to associate the Instagram account with a user record in your database,
           // and return that user instead.
 
-          return done(null, profile);
+          return done(null, user);
         });
       })
     });
@@ -235,7 +236,7 @@ app.get('/instagram', ensureAuthenticated, function(req, res){
       // doc may be null if no document matched
 
       Instagram.users.self({
-        access_token: INSTAGRAM_ACCESS_TOKEN,
+        access_token: user.access_token,
         complete: function(data) {
             var imageArr = data.map(function(item) {
               tempJSON = {};
