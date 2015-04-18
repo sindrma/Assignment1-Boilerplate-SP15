@@ -63,18 +63,25 @@ passport.use(new FacebookStrategy({
       callbackURL: FACEBOOK_CALLBACK_URL
     },
     function(accessToken, refreshToken, profile, done) {
-      models.User.findOrCreate({
-        "name": profile.displayName,
-        "id": profile.id
-      }, function(err, user, created) {
-        models.User.findOrCreate({}, function(err, user, created) {
-          user.access_token = accessToken;
-          process.nextTick(function () {
-            user.access_token = accessToken;
-            return done(null, user);
-          });
-      })
-    });
+        process.nextTick(function() {
+            models.User.findOne({fb_id : profile.id}, function(err, user){
+                if(user){
+                    user.access_token_fb = accessToken;
+                    user.save();
+                    done(null,user);
+                }else{
+                    var newUser = new models.User({
+                        fb_id : profile.id ,
+                        name : profile.displayName,
+                        access_token_fb : accessToken
+                    }).save(function(err,newUser){
+                            if(err) throw err;
+                            done(null, newUser);
+                        });
+                }
+            });
+
+        });
   }
 ));
 
@@ -88,28 +95,26 @@ passport.use(new InstagramStrategy({
     callbackURL: INSTAGRAM_CALLBACK_URL
   },
   function(accessToken, refreshToken, profile, done) {
-    INSTAGRAM_ACCESS_TOKEN = accessToken;
-    models.User.findOrCreate({
-      "name": profile.username,
-      "id": profile.id
-    }, function(err, user, created) {
+      process.nextTick(function() {
+          models.User.findOne({ig_id : profile.id}, function(err, user){
+              if(user){
+                  user.access_token_ig = accessToken;
+                  user.save();
+                  done(null,user);
+              }else{
+                  var newUser = new models.User({
+                      ig_id : profile.id ,
+                      username : profile.username,
+                      ig_prof_pic : profile._json.data.profile_picture,
+                      access_token_ig : accessToken
+                  }).save(function(err, newUser){
+                          if(err) throw err;
+                          done(null, newUser);
+                      });
+              }
+          });
 
-      models.User.findOrCreate({}, function(err, user, created) {
-
-        process.nextTick(function () {
-
-          // To keep the example simple, the user's Instagram profile is returned to
-          // represent the logged-in user.  In a typical application, you would want
-          // to associate the Instagram account with a user record in your database,
-          // and return that user instead.
-
-
-
-          return done(null, profile);
-
-        });
-      })
-    });
+      });
   }
 ));
 
@@ -142,6 +147,13 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
+function ensureAuthenticatedInstagram(req, res, next) {
+    if (req.isAuthenticated() && !req.user.access_token_fb) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
 //routes
 app.get('/', function(req, res){
   res.render('login');
@@ -154,7 +166,7 @@ app.get('/login', function(req, res){
 app.get('/facebook', ensureAuthenticated, function(req, res){
   var page=res;
 
-  var fb = new fbgraph.Facebook(req.user.access_token, 'v2.2');
+  var fb = new fbgraph.Facebook(req.user.access_token_fb, 'v2.2');
 
   fb.graph('/me', function(err, res) {
     me = res;
@@ -183,7 +195,7 @@ app.get('/facebook', ensureAuthenticated, function(req, res){
 app.get('/facebook_photos', ensureAuthenticated, function(req, res){
   var page=res;
 
-  var fb = new fbgraph.Facebook(req.user.access_token, 'v2.2');
+  var fb = new fbgraph.Facebook(req.user.access_token_fb, 'v2.2');
 
   fb.graph('/me', function(err, res) {
     me = res;
@@ -210,15 +222,16 @@ app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', {user: req.user});
 });
 
-app.get('/instagram', ensureAuthenticated, function(req, res){
-  var query  = models.User.where({ name: req.user.username });
+app.get('/instagram', ensureAuthenticatedInstagram, function(req, res){
+
+  var query  = models.User.where({ username: req.user.username });
   query.findOne(function (err, user) {
     if (err) return handleError(err);
     if (user) {
       // doc may be null if no document matched
 
       Instagram.users.self({
-        access_token: INSTAGRAM_ACCESS_TOKEN,
+        access_token: user.access_token_ig,
         complete: function(data) {
             var imageArr = data.map(function(item) {
               tempJSON = {};
